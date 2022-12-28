@@ -71,3 +71,125 @@ def update_meanpi(state,C,MeanPolicy,Policy):
 	for i in range(0,total_actions):
 		MeanPolicy[state,i] = MeanPolicy[state,i] + ((1.0/C[state]) * (Policy[state,i]-MeanPolicy[state,i]))
 	return	MeanPolicy
+
+
+################################################################################
+# Agents
+def agent1():
+	Q = np.zeros((total_states,total_actions))
+	C = np.zeros(total_states)
+	Policy = np.empty([total_states,total_actions])
+	MeanPolicy = np.zeros((total_states,total_actions))
+
+	Policy = np.array([
+	[1.0/3, 1.0/3, 1.0/3],
+	[1.0/3, 1.0/3, 1.0/3],
+	[1.0/3, 1.0/3, 1.0/3],
+	[1.0/3, 1.0/3, 1.0/3],
+	[1.0/3, 1.0/3, 1.0/3],
+	[1.0/3, 1.0/3, 1.0/3],
+	[1.0/3, 1.0/3, 1.0/3],
+	[1.0/3, 1.0/3, 1.0/3]
+	])
+
+
+	R= np.matrix([
+		[-1, -1, 0],
+		[-1, -1, 0],
+		[-1, 3, 0],
+		[-1, -1, 0],
+		[-1, 3, 0],
+		[-1, -1, 0],
+		[-1, 3, 0],
+		[-1, 3, 0]])
+
+	for i in range(0,iterations):
+		#first step
+		state = np.random.randint(0,total_states)
+		available_actions = actions_present(R[state])
+
+		while state != 8:
+
+			if (isinstance (state, (np.ndarray,np.generic))):
+				action = actions_select(state[0],Policy)
+			else:
+				action = actions_select(state,Policy)
+			Q[state,action]=updateQ(state,action,Q,R)
+
+			C[state] = C[state]+1
+			MeanPolicy = update_meanpi(state,C,MeanPolicy,Policy)
+			Policy = update_pi(state,Policy,MeanPolicy,Q,d_win,d_lose)
+
+			next_state=action
+			if next_state==end:
+				break
+			state=next_state
+			available_actions=actions_present(R[state])
+
+	print("Final Q values for agent1: \n {}\n".format(Q))
+	print("Final Policy for agent1: \n {}\n".format(Policy))
+	print("Final Mean Policy for agent1: \n {}\n".format(MeanPolicy))
+	return Policy
+
+
+
+def agent2():
+	Q = np.zeros((total_states,total_actions))
+	C = np.zeros(total_states)
+	Policy = np.empty([total_states,total_actions])
+	MeanPolicy = np.zeros((total_states,total_actions))
+
+	Policy = np.array([
+	[1.0/3, 1.0/3, 1.0/3],
+	[1.0/3, 1.0/3, 1.0/3],
+	[1.0/3, 1.0/3, 1.0/3],
+	[1.0/3, 1.0/3, 1.0/3],
+	[1.0/3, 1.0/3, 1.0/3],
+	[1.0/3, 1.0/3, 1.0/3],
+	[1.0/3, 1.0/3, 1.0/3],
+	[1.0/3, 1.0/3, 1.0/3]
+	])
+
+	R = np.matrix([
+		[-1, -1, 0],
+		[-1, -1, 0],
+		[-1, -1, 0],
+		[-1, 3, 0],
+		[-1, -1, 0],
+		[-1, 3, 0],
+		[-1, 3, 0],
+		[-1, 3, 0]])
+
+
+	pick = []
+	deliver = []
+	wait = []
+	for i in range(0,iterations):
+		#first step
+		state = np.random.randint(0,total_states)
+
+		available_actions = actions_present(R[state])
+
+		while state != 8:
+
+			if (isinstance (state, (np.ndarray,np.generic))):
+				action = actions_select(state[0],Policy)
+			else:
+				action = actions_select(state,Policy)
+			Q[state,action]=updateQ(state,action,Q,R)
+			C[state] = C[state]+1
+			MeanPolicy = update_meanpi(state,C,MeanPolicy,Policy)
+			Policy = update_pi(state,Policy,MeanPolicy,Q,d_win,d_lose)
+
+
+			next_state=action
+			if next_state==end:
+				break
+			state=next_state
+			available_actions=actions_present(R[state])
+
+	print("Final Q values for agent2: \n {}\n".format(Q))
+	print("Final Policy for agent2: \n {}\n".format(Policy))
+	print("Final Mean Policy for agent2: \n {}\n".format(MeanPolicy))
+
+	return Policy
