@@ -10,8 +10,21 @@ from scipy.stats import norm
 # Games running data
 np.set_printoptions(threshold=np.inf)
 
-total_states = 8
-total_actions = 3
+total_states = 4
+total_actions = 2
+
+
+
+
+
+################################################################################
+# TODO: Modify the rest of the code for the Matching Pennies Game
+################################################################################
+
+
+
+
+
 iterations = 15000
 alpha = 0.2   #Learning Rate
 df = 0.8  #discount Factor
