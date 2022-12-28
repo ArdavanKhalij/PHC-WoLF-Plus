@@ -193,3 +193,25 @@ def agent2():
 	print("Final Mean Policy for agent2: \n {}\n".format(MeanPolicy))
 
 	return Policy
+
+
+################################################################################
+# Running
+if __name__ == "__main__":
+    policy1 = agent1()
+policy2 = agent2()
+ne = []
+eq1 = policy1.argmax(axis = 1)
+eq2 = policy2.argmax(axis = 1)
+eq = np.concatenate((eq1, eq2), axis=0)
+for i in range(len(eq)):
+	if(eq[i] == 0):
+		ne.append('Pick')
+	elif(eq[i] == 1):
+		ne.append('Deliver')
+	else:
+		ne.append('Wait')
+
+for i, j in zip(range(0, 8, +1), range(8, len(ne), +1)):
+	state_ne = '(' + ne[i] + ',' + ne[j] + ')'
+	print("Nash Equilibrium for state {}: {}\n".format(i, state_ne))
