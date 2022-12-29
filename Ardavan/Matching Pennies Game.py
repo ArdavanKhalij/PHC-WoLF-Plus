@@ -12,23 +12,10 @@ np.set_printoptions(threshold=np.inf)
 
 total_states = 4
 total_actions = 2
-
-
-
-
-
-################################################################################
-# TODO: Modify the rest of the code for the Matching Pennies Game
-################################################################################
-
-
-
-
-
-iterations = 15000
+iterations = 1000000
 alpha = 0.2   #Learning Rate
 df = 0.8  #discount Factor
-d_win = 0.0025
+d_win = 0.005
 d_lose = 0.01
 end = total_actions - 1
 
@@ -53,10 +40,10 @@ def updateQ(state,action,Q,R):
 def actions_select(state,Policy):
 	p1=Policy[state,:]
 	if (np.sum(p1)==1.0):
-		return np.random.choice(3,1,p=p1)
+		return np.random.choice(total_actions,1,p=p1)
 	else:
 		p1 /= p1.sum()
-		return np.random.choice(3,1,p=p1)
+		return np.random.choice(total_actions,1,p=p1)
 
 def delta(state,Q,Policy,MeanPolicy,d_win,d_lose):
 	sumPolicy=0.0
@@ -88,6 +75,21 @@ def update_meanpi(state,C,MeanPolicy,Policy):
 
 ################################################################################
 # Agents
+
+
+
+
+
+
+################################################################################
+# TODO: Modify the rest of the code for the Matching Pennies Game
+################################################################################
+
+
+
+
+
+
 def agent1():
 	Q = np.zeros((total_states,total_actions))
 	C = np.zeros(total_states)
