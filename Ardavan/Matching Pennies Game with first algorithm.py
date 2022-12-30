@@ -48,10 +48,10 @@ def rewards_robot_2():
 ################################################################################################
 # Agents and Running
 if __name__ == "__main__":
-    alpha_loose = 1
-    alpha_win = 0.25
+    alpha_loose = 0.2
+    alpha_win = 0.05
     discount_factor = 0.9
-    alpha = 0.00001
+    alpha = 0.000001
     ITERATIONS = 1000000
     NumberOfAction = 2
     NumberOfState = 4
@@ -125,11 +125,19 @@ if __name__ == "__main__":
                             policy_initial_robot_1[i][j] = policy_initial_robot_1[i][j] + delta
                         else:
                             policy_initial_robot_1[i][j] = policy_initial_robot_1[i][j] + (-delta / 2)
-        p_for_graph_agent_1.append(
-            ((abs(policy_initial_robot_1[0][0]) / (abs(policy_initial_robot_1[0][0]) + abs(policy_initial_robot_1[0][1]))) +
-             (abs(policy_initial_robot_1[1][0]) / (abs(policy_initial_robot_1[1][0]) + abs(policy_initial_robot_1[1][1]))) +
-             (abs(policy_initial_robot_1[2][0]) / (abs(policy_initial_robot_1[2][0]) + abs(policy_initial_robot_1[2][1]))) +
-             (abs(policy_initial_robot_1[3][0]) / (abs(policy_initial_robot_1[3][0]) + abs(policy_initial_robot_1[3][1])))) / 4)
+        sum = 0
+        for k in range(0, NumberOfState):
+            if policy_initial_robot_1[k][0] < 0 and policy_initial_robot_1[k][1] < 0:
+                sum = sum + (abs(policy_initial_robot_1[k][1]) /
+                             (abs(policy_initial_robot_1[k][0]) + abs(policy_initial_robot_1[k][1])))
+            elif policy_initial_robot_1[k][0] > 0 and policy_initial_robot_1[k][1] < 0:
+                sum = sum + 1
+            elif policy_initial_robot_1[k][0] < 0 and policy_initial_robot_1[k][1] > 0:
+                sum = sum + 0
+            else:
+                sum = sum + (abs(policy_initial_robot_1[k][0]) /
+                             (abs(policy_initial_robot_1[k][0]) + abs(policy_initial_robot_1[k][1])))
+        p_for_graph_agent_1.append(sum / NumberOfState)
 
     # print(policy_initial_robot_1)
 
@@ -187,11 +195,20 @@ if __name__ == "__main__":
                             policy_initial_robot_2[i][j] = policy_initial_robot_2[i][j] + delta
                         else:
                             policy_initial_robot_2[i][j] = policy_initial_robot_2[i][j] + (-delta / 2)
-        p_for_graph_agent_2.append(
-            ((abs(policy_initial_robot_2[0][0]) / (abs(policy_initial_robot_2[0][0]) + abs(policy_initial_robot_2[0][1]))) +
-             (abs(policy_initial_robot_2[1][0]) / (abs(policy_initial_robot_2[1][0]) + abs(policy_initial_robot_2[1][1]))) +
-             (abs(policy_initial_robot_2[2][0]) / (abs(policy_initial_robot_2[2][0]) + abs(policy_initial_robot_2[2][1]))) +
-             (abs(policy_initial_robot_2[3][0]) / (abs(policy_initial_robot_2[3][0]) + abs(policy_initial_robot_2[3][1])))) / 4)
+        sum = 0
+        for k in range(0, NumberOfState):
+            if policy_initial_robot_2[k][0] < 0 and policy_initial_robot_2[k][1] < 0:
+                sum = sum + (abs(policy_initial_robot_2[k][1]) /
+                    (abs(policy_initial_robot_2[k][0]) + abs(policy_initial_robot_2[k][1])))
+            elif policy_initial_robot_2[k][0] > 0 and policy_initial_robot_2[k][1] < 0:
+                sum = sum + 1
+            elif policy_initial_robot_2[k][0] < 0 and policy_initial_robot_2[k][1] > 0:
+                sum = sum + 0
+            else:
+                sum = sum + (abs(policy_initial_robot_2[k][0]) /
+                    (abs(policy_initial_robot_2[k][0]) + abs(policy_initial_robot_2[k][1])))
+        p_for_graph_agent_2.append(sum/NumberOfState)
+
 
     print("Final Q values for Robot 1\n")
     print(q_initial_robot_1)
