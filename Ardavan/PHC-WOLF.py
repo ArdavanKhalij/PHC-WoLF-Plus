@@ -7,13 +7,13 @@ import matplotlib.pyplot as plt
 
 ############################################################################
 # Data of the problem
-alpha = 0.0001
+alpha = 0.3
 # delta = 0.00001
 delta_w = 0.0001
 delta_l = 0.0002
 NumberOfStates = 2
 NumberOfActions = 2
-Iterations = 1000000
+Iterations = 100000
 gamma = 0.9
 RUN = 1
 ############################################################################
@@ -126,8 +126,8 @@ for run in range(0, RUN):
         p.append(Average_Policy1[0][0])
         for j in range(0, NumberOfStates):
             # Choose Action
-            action1 = np.random.choice([0, 1], p=Policy1[j])
-            action2 = np.random.choice([0, 1], p=Policy2[j])
+            action1 = np.random.choice(range(0, NumberOfActions), p=Policy1[j])
+            action2 = np.random.choice(range(0, NumberOfActions), p=Policy2[j])
             # Get rewards
             reward1 = Rewards[action1][action2]
             reward2 = -1 * reward1
@@ -153,29 +153,33 @@ for run in range(0, RUN):
             # Update policy
             delta1, delta2 = get_delta(j)
             if action1 == QPrim1.index(max(QPrim1)):
-                if Policy1[j][action1] < 1 - delta1:
-                    Policy1[j][action1] = Policy1[j][action1] + delta1
-                    for k in range(0, NumberOfActions):
-                        if k != action1:
-                            Policy1[j][k] = Policy1[j][k] - (delta1/(NumberOfActions - 1))
+                if Policy1[j][action1] <= 1 - delta1:
+                    if min(Policy2[j]) >= (delta1 / (NumberOfStates - 1)):
+                        Policy1[j][action1] = Policy1[j][action1] + delta1
+                        for k in range(0, NumberOfActions):
+                            if k != action1:
+                                Policy1[j][k] = Policy1[j][k] - (delta1/(NumberOfActions - 1))
             else:
-                if Policy1[j][action1] > delta1:
-                    Policy1[j][action1] = Policy1[j][action1] - (delta1 / (NumberOfActions - 1))
-                    for k in range(0, NumberOfActions):
-                        if k != action1:
-                            Policy1[j][k] = Policy1[j][k] + ((delta1 / (NumberOfActions - 1))/(NumberOfActions - 1))
+                if Policy1[j][action1] >= delta1:
+                    if max(Policy1[j]) <= 1 - (delta1 / (NumberOfStates - 1)):
+                        Policy1[j][action1] = Policy1[j][action1] - (delta1 / (NumberOfActions - 1))
+                        for k in range(0, NumberOfActions):
+                            if k != action1:
+                                Policy1[j][k] = Policy1[j][k] + ((delta1 / (NumberOfActions - 1))/(NumberOfActions - 1))
             if action2 == QPrim2.index(max(QPrim2)):
-                if Policy2[j][action2] < 1 - delta2:
-                    Policy2[j][action2] = Policy2[j][action2] + delta2
-                    for k in range(0, NumberOfActions):
-                        if k != action2:
-                            Policy2[j][k] = Policy2[j][k] - (delta2/(NumberOfActions - 1))
+                if Policy2[j][action2] <= 1 - delta2:
+                    if min(Policy2[j]) >= (delta2 / (NumberOfStates - 1)):
+                        Policy2[j][action2] = Policy2[j][action2] + delta2
+                        for k in range(0, NumberOfActions):
+                            if k != action2:
+                                Policy2[j][k] = Policy2[j][k] - (delta2/(NumberOfActions - 1))
             else:
-                if Policy2[j][action2] > delta2:
-                    Policy2[j][action2] = Policy2[j][action2] - (delta2/(NumberOfActions - 1))
-                    for k in range(0, NumberOfActions):
-                        if k != action2:
-                            Policy2[j][k] = Policy2[j][k] + ((delta2 / (NumberOfActions - 1))/(NumberOfActions - 1))
+                if Policy2[j][action2] >= delta2:
+                    if max(Policy2[j]) <= 1 - (delta2/(NumberOfStates - 1)):
+                        Policy2[j][action2] = Policy2[j][action2] - (delta2/(NumberOfActions - 1))
+                        for k in range(0, NumberOfActions):
+                            if k != action2:
+                                Policy2[j][k] = Policy2[j][k] + ((delta2 / (NumberOfActions - 1))/(NumberOfActions - 1))
 
     p_of_head_1.append(p)
     p = []
