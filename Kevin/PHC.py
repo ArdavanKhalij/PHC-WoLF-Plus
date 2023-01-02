@@ -7,13 +7,15 @@ import matplotlib.pyplot as plt
 
 ############################################################################
 # Data of the problem
-alpha = 0.001
+alpha = 0.0001
 delta = 0.000001
 NumberOfStates = 3
 NumberOfActions = 3
 Iterations = 1000000
-gamma = 0.9
+gamma = 0.99
 RUN = 1
+
+AVERAGEEVERY = 100
 ############################################################################
 
 
@@ -85,8 +87,8 @@ for run in range(0, RUN):
         if i % 1000 == 0:
             print(i)
         #
-        p.append(Policy1[0][1])  # Probability of playing Paper
-        p2.append(Policy1[0][0])  # Probability of playing Rock
+        p.append(Policy1[0][1])  # Probability of playing Rock
+        p2.append(Policy1[0][0])  # Probability of playing Paper
 
         for j in range(0, NumberOfStates):
             # Choose Action
@@ -105,13 +107,15 @@ for run in range(0, RUN):
                     (alpha * (reward1 + gamma * max(Q1[j])))
             else:
                 Q1[j][action1] = ((1 - alpha) * Q1[j][action1]) + \
-                    (alpha * (reward1 + gamma * max(Q1[(j + 1) % 2])))
+                    (alpha * (reward1 + gamma *
+                              max(Q1[(j + 1) % NumberOfStates])))
             if reward2 == max(Rewards[0]):
                 Q2[j][action2] = ((1 - alpha) * Q2[j][action2]) + \
                     (alpha * (reward2 + gamma * max(Q2[j])))
             else:
                 Q2[j][action2] = ((1 - alpha) * Q2[j][action2]) + \
-                    (alpha * (reward2 + gamma * max(Q2[(j + 1) % 2])))
+                    (alpha * (reward2 + gamma *
+                              max(Q2[(j + 1) % NumberOfStates])))
             if action1 == QPrim1.index(max(QPrim1)):
                 if Policy1[j][action1] <= 1 - delta:
                     if min(Policy2[j]) >= (delta / (NumberOfStates - 1)):
@@ -151,6 +155,7 @@ for run in range(0, RUN):
     p_of_head_1.append(p)
     p_of_head_2.append(p2)
     p = []
+    p2 = []
     Policy1 = []
     for i in range(0, NumberOfStates):
         Policy1.append([])
@@ -179,25 +184,43 @@ for run in range(0, RUN):
 plottingx = []
 plottingy = []
 # print(len(p_of_head_1[0]))
-for i in range(0, len(p_of_head_1[0]), 1):
+for i in range(0, len(p_of_head_1[0]), AVERAGEEVERY):
     x = []
     for j in range(0, len(p_of_head_1)):
-        avgOf300 = sum(p_of_head_1[j][i:i + 1]) / \
-            len(p_of_head_1[j][i:i + 1])
+        avgOf300 = sum(p_of_head_1[j][i:i + AVERAGEEVERY]) / \
+            len(p_of_head_1[j][i:i + AVERAGEEVERY])
         x.append(avgOf300)
     plottingx.append(sum(x) / len(x))
 
 
-for i in range(0, len(p_of_head_2[0]), 1):
+for i in range(0, len(p_of_head_2[0]), AVERAGEEVERY):
     x = []
-    for j in range(0, len(p_of_head_1)):
-        avgOf300 = sum(p_of_head_2[j][i:i + 1]) / \
-            len(p_of_head_2[j][i:i + 1])
+    for j in range(0, len(p_of_head_2)):
+        avgOf300 = sum(p_of_head_2[j][i:i + AVERAGEEVERY]) / \
+            len(p_of_head_2[j][i:i + AVERAGEEVERY])
         x.append(avgOf300)
     plottingy.append(sum(x) / len(x))
+#plt.subplot(1, 2, 1)
+# plt.plot(plottingx)
 
-plt.plot(plottingx, plottingy)
+#plt.subplot(1, 2, 2)
+# plt.plot(plottingy)
+
+#plt.subplot(2, 1, 3)
+#
+
+
 # plt.plot(p_of_head_1[0])
 #plt.plot(p_of_head_2, color="red")
+
+
+# plt.plot(p_of_head_1[0])
+#plt.plot(p_of_head_2, color="red")
+
+plt.plot(plottingx[:200], plottingy[:200], color='red')
+plt.plot(plottingx[200:], plottingy[200:], color='green')
+
+plt.xlabel("Pr(Rock)")
+plt.ylabel("Pr(Paper)")
 plt.show()
 ############################################################################

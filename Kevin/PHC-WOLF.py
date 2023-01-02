@@ -13,9 +13,11 @@ delta_w = 0.00001
 delta_l = 0.00002
 NumberOfStates = 3
 NumberOfActions = 3
-Iterations = 1000000
+Iterations = 100000
 gamma = 0.9
 RUN = 1
+
+AVERAGEEVERY = 100
 ############################################################################
 
 
@@ -24,6 +26,7 @@ RUN = 1
 p_of_head_1 = []
 p_of_head_2 = []
 p = []
+p2 = []
 ############################################################################
 
 
@@ -124,7 +127,8 @@ for run in range(0, RUN):
         # print(Q1)
         if i % 1000 == 0:
             print(i)
-        p.append(Average_Policy1[0][0])
+        p.append(Policy1[0][1])
+        p2.append(Policy1[0][0])
         for j in range(0, NumberOfStates):
             # Choose Action
             action1 = np.random.choice(range(0, NumberOfActions), p=Policy1[j])
@@ -137,18 +141,20 @@ for run in range(0, RUN):
             QPrim2 = []
             QPrim1 = Q1[j]
             QPrim2 = Q2[j]
-            if reward1 == max(Rewards[0]):
+            if reward1 == max(Rewards[0] or reward1 != min(Rewards[0])):
                 Q1[j][action1] = ((1 - alpha) * Q1[j][action1]) + \
                     (alpha * (reward1 + gamma * max(Q1[j])))
             else:
                 Q1[j][action1] = ((1 - alpha) * Q1[j][action1]) + \
-                    (alpha * (reward1 + gamma * max(Q1[(j + 1) % 2])))
-            if reward2 == max(Rewards[0]):
+                    (alpha * (reward1 + gamma *
+                              max(Q1[(j + 1) % NumberOfStates])))
+            if reward2 == max(Rewards[0] or reward2 != min(Rewards[0])):
                 Q2[j][action2] = ((1 - alpha) * Q2[j][action2]) + \
                     (alpha * (reward2 + gamma * max(Q2[j])))
             else:
                 Q2[j][action2] = ((1 - alpha) * Q2[j][action2]) + \
-                    (alpha * (reward2 + gamma * max(Q2[(j + 1) % 2])))
+                    (alpha * (reward2 + gamma *
+                              max(Q2[(j + 1) % NumberOfStates])))
             # Update average policy
             C1[j] = C1[j] + 1
             C2[j] = C2[j] + 1
@@ -197,7 +203,9 @@ for run in range(0, RUN):
                                      (NumberOfActions - 1))
 
     p_of_head_1.append(p)
+    p_of_head_2.append(p2)
     p = []
+    p2 = []
     Policy1 = []
     for i in range(0, NumberOfStates):
         Policy1.append([])
@@ -223,16 +231,31 @@ for run in range(0, RUN):
 
 ############################################################################
 # Plotting
-plotting = []
+plottingx = []
+plottingy = []
 # print(len(p_of_head_1[0]))
-for i in range(0, len(p_of_head_1[0]), 1):
+for i in range(0, len(p_of_head_1[0]), AVERAGEEVERY):
     x = []
     for j in range(0, len(p_of_head_1)):
-        avgOf300 = sum(p_of_head_1[j][i:i + 1]) / len(p_of_head_1[j][i:i + 1])
+        avgOf300 = sum(p_of_head_1[j][i:i + AVERAGEEVERY]) / \
+            len(p_of_head_1[j][i:i + 1])
         x.append(avgOf300)
-    plotting.append(sum(x) / len(x))
-plt.plot(plotting)
+    plottingx.append(sum(x) / len(x))
+
+
+for i in range(0, len(p_of_head_2[0]), AVERAGEEVERY):
+    x = []
+    for j in range(0, len(p_of_head_1)):
+        avgOf300 = sum(p_of_head_2[j][i:i + AVERAGEEVERY]) / \
+            len(p_of_head_2[j][i:i + AVERAGEEVERY])
+        x.append(avgOf300)
+    plottingy.append(sum(x) / len(x))
+
+
+plt.plot(plottingx[:50], plottingy[:50], color='red')
 # plt.plot(p_of_head_1[0])
-# plt.plot(p_of_head_2, color="red")
+#plt.plot(p_of_head_2, color="red")
+
+plt.plot(plottingx[50:], plottingy[50:], color='green')
 plt.show()
 ############################################################################
