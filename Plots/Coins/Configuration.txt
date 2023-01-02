@@ -1,9 +1,20 @@
 PHC:
-alpha = 0.001
-delta = 0.000001
+
+alpha = 0.2
+delta = 0.000005
 NumberOfStates = 2
 NumberOfActions = 2
 Iterations = 1000000
 gamma = 0.99
 RUN = 1
 -----------------------------------------
+PHC-WOLF:
+
+alpha = 0.2
+delta_w = 0.00005
+delta_l = 0.0001
+NumberOfStates = 2
+NumberOfActions = 2
+Iterations = 1000000
+gamma = 0.99
+RUN = 1
