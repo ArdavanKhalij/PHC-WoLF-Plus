@@ -1,1 +1,11 @@
+PHC:
 
+alpha = 0.001
+delta = 0.000001
+NumberOfStates = 3
+NumberOfActions = 3
+Iterations = 3000000
+gamma = 0.99
+RUN = 1
+average 100
+------------------------
