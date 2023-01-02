@@ -13,11 +13,11 @@ delta_w = 0.0001
 delta_l = 0.0002
 NumberOfStates = 3
 NumberOfActions = 3
-Iterations = 1000000
+Iterations = 300000
 gamma = 0.99
 RUN = 1
 
-AVERAGEEVERY = 100
+AVERAGEEVERY = 1
 ############################################################################
 
 
@@ -140,7 +140,7 @@ for run in range(0, RUN):
         if i % 1000 == 0:
             print(i)
         p.append(Policy1[0][1])
-        p2.append(Policy2[0][0])
+        p2.append(Policy1[0][0])
         for j in range(0, NumberOfStates):
             # Choose Action
             action1 = np.random.choice(range(0, NumberOfActions), p=Policy1[j])
