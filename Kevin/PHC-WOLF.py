@@ -7,14 +7,14 @@ import matplotlib.pyplot as plt
 
 ############################################################################
 # Data of the problem
-alpha = 0.001
+alpha = 0.1
 # delta = 0.00001
-delta_w = 0.00001
-delta_l = 0.00002
+delta_w = 0.0001
+delta_l = 0.0002
 NumberOfStates = 3
 NumberOfActions = 3
-Iterations = 100000
-gamma = 0.9
+Iterations = 1000000
+gamma = 0.99
 RUN = 1
 
 AVERAGEEVERY = 100
@@ -47,7 +47,7 @@ for i in range(0, NumberOfStates):
 
 ############################################################################
 # Creating policy table
-Policy1 = []
+"""Policy1 = []
 for i in range(0, NumberOfStates):
     Policy1.append([])
     for j in range(0, NumberOfActions):
@@ -56,7 +56,19 @@ Policy2 = []
 for i in range(0, NumberOfStates):
     Policy2.append([])
     for j in range(0, NumberOfActions):
-        Policy2[i].append(1 / NumberOfActions)
+        Policy2[i].append(1 / NumberOfActions)"""
+
+Policy1 = [
+    [0.25, 0.25, 0.50],
+    [0.25, 0.25, 0.50],
+    [0.25, 0.25, 0.50]
+]
+
+Policy2 = [
+    [0.50, 0.25, 0.25],
+    [0.50, 0.25, 0.25],
+    [0.50, 0.25, 0.25]
+]
 ############################################################################
 
 
@@ -128,7 +140,7 @@ for run in range(0, RUN):
         if i % 1000 == 0:
             print(i)
         p.append(Policy1[0][1])
-        p2.append(Policy1[0][0])
+        p2.append(Policy2[0][0])
         for j in range(0, NumberOfStates):
             # Choose Action
             action1 = np.random.choice(range(0, NumberOfActions), p=Policy1[j])
@@ -252,10 +264,15 @@ for i in range(0, len(p_of_head_2[0]), AVERAGEEVERY):
     plottingy.append(sum(x) / len(x))
 
 
-plt.plot(plottingx[:50], plottingy[:50], color='red')
+plt.plot(plottingx[:200], plottingy[:200], color='red')
 # plt.plot(p_of_head_1[0])
 #plt.plot(p_of_head_2, color="red")
 
-plt.plot(plottingx[50:], plottingy[50:], color='green')
+plt.plot(plottingx[200:], plottingy[200:], color='green')
+
+# plt.plot(plottingx)
+
+plt.xlabel("Pr(Rock)")
+plt.ylabel("Pr(Paper)")
 plt.show()
 ############################################################################
