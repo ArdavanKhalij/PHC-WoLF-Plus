@@ -10,11 +10,11 @@ from stable_baselines3.common.env_checker import check_env
 
 
 class Actions(IntEnum):
-    Stay = 0
-    North = 1
-    East = 2
-    South = 3
-    West = 4
+    # Stay = 0
+    North = 0
+    East = 1
+    South = 2
+    West = 3
 
 
 class Agent:
@@ -112,8 +112,8 @@ class BabyRobotEnv_v1(gym.Env):
         self.max_x = self.width - 1
         self.max_y = self.height - 1
 
-        # there are 5 possible actions: move N,E,S,W or stay in same state
-        self.action_space = Discrete(5)
+        # there are 5 possible actions: move N,E,S,W
+        self.action_space = Discrete(4)
 
         # the observation will be the coordinates of Baby Robot
         self.observation_space = MultiDiscrete([self.width, self.height])
