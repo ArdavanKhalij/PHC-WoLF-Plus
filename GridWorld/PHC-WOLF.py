@@ -1,7 +1,7 @@
 ############################################################################
 # Libraries
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import GridWorldGame as gw
 
 ############################################################################
@@ -11,8 +11,8 @@ import GridWorldGame as gw
 # Data of the problem
 alpha = 0.1
 # delta = 0.00001
-delta_w = 0.0001
-delta_l = 0.0002
+delta_w = 0.00001
+delta_l = 0.00004
 NumberOfStates = 9
 NumberOfActions = 4
 Iterations = 100000
@@ -127,21 +127,21 @@ def convert_to_state(x, y):
 
     if x == 0 and y == 0:
         return 6
-    if x == 2 and y == 0:
+    elif x == 2 and y == 0:
         return 7
-    if x == 0 and y == 1:
+    elif x == 0 and y == 1:
         return 3
-    if x == 1 and y == 1:
+    elif x == 1 and y == 1:
         return 4
-    if x == 2 and y == 1:
+    elif x == 2 and y == 1:
         return 5
-    if x == 0 and y == 2:
+    elif x == 0 and y == 2:
         return 0
-    if x == 1 and y == 2:
+    elif x == 1 and y == 2:
         return 1
-    if x == 2 and y == 2:
+    elif x == 2 and y == 2:
         return 2
-    if x == 1 and y == 0:
+    elif x == 1 and y == 0:  # THis is the goal state
         return 8
 
 
@@ -171,7 +171,6 @@ for run in range(0, RUN):
         # print(Q1)
         if i % 1000 == 0:
             print(i)
-        p.append(env.agents[0].cum_rew)
         # p2.append(Policy1[0][0])
         # for j in range(0, NumberOfStates):
 
@@ -182,15 +181,19 @@ for run in range(0, RUN):
         env.agents[1].cum_rew = 0
         done = False
 
+        # Find the initial state of the agents
+        state1 = convert_to_state(env.agents[0].x, env.agents[0].y)
+        state2 = convert_to_state(env.agents[1].x, env.agents[1].y)
+
         while not done:
 
-            # Find the initial state of the agents
-            state1 = convert_to_state(env.agents[0].x, env.agents[0].y)
-            state2 = convert_to_state(env.agents[1].x, env.agents[1].y)
-
             # Choose Action
-            action1 = np.random.choice(range(0, NumberOfActions), p=Policy1[j])
-            action2 = np.random.choice(range(0, NumberOfActions), p=Policy2[j])
+            action1 = np.random.choice(range(0, NumberOfActions), p=Policy1[state1])
+            action2 = np.random.choice(range(0, NumberOfActions), p=Policy2[state2])
+
+            # action1 = env.action_space.sample()
+            # action2 = env.action_space.sample()
+
             # Get rewards and new state
             new_state1, new_state2, reward1, reward2, done, info = env.step(
                 action1=action1, action2=action2
@@ -198,6 +201,9 @@ for run in range(0, RUN):
 
             new_state1 = convert_to_state(new_state1[0], new_state1[1])
             new_state2 = convert_to_state(new_state2[0], new_state2[1])
+
+            # print(f"new_state1 is : {new_state1}")
+            # print(f"new_state2 is : {new_state2}")
 
             # Update Q table
             Q1[state1][action1] = ((1 - alpha) * Q1[state1][action1]) + (
@@ -264,10 +270,19 @@ for run in range(0, RUN):
                                     (delta2 / (NumberOfActions - 1))
                                     / (NumberOfActions - 1)
                                 )
+
+            state1 = new_state1
+            state2 = new_state2
+
             env.agents[0].cum_rew += reward1
             env.agents[1].cum_rew += reward2
+            env.render(
+                action1=action1, action2=action2, reward1=reward1, reward2=reward2
+            )
 
-            # env.render()
+        print(f" ")
+        print(f" Cumulative rew of agent 1 {env.agents[0].cum_rew}")
+        p.append(env.agents[0].cum_rew)
 
     p_of_head_1.append(p)
     p_of_head_2.append(p2)

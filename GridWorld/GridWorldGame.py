@@ -1,12 +1,14 @@
-import numpy as np
 import gym
+import numpy as np
 from gym.spaces import Discrete, MultiDiscrete
 from enum import IntEnum
 from random import uniform
 from copy import copy
 from stable_baselines3.common.env_checker import check_env
 
-""" simple helper class to enumerate actions in the grid levels """
+###########################################################################
+# Gridworld Game #########################################################
+#########################################################################
 
 
 class Actions(IntEnum):
@@ -15,6 +17,10 @@ class Actions(IntEnum):
     East = 1
     South = 2
     West = 3
+
+    # get the enum name without the class
+    def __str__(self):
+        return self.name
 
 
 class Agent:
@@ -32,26 +38,30 @@ class Agent:
         x = copy(self.x)
         y = copy(self.y)
 
-        # move in the direction of the specified action
         if action == Actions.North:
-            if self.x == 0 and self.y == 2:
+            if x == 0 and y == 2:
                 rand = uniform(0, 1)
                 if rand < 0.5:
-                    y -= 1
-            elif self.x == 2 and self.y == 2:
+                    if y - 1 > 0:
+                        y -= 1
+            elif x == 2 and y == 2:
                 rand = uniform(0, 1)
                 if rand < 0.5:
-                    y -= 1
+                    if y - 1 > 0:
+                        y -= 1
             else:
                 y -= 1
         elif action == Actions.South:
-            y += 1
+            if y + 1 < self.max_y:
+                y += 1
         elif action == Actions.West:
-            x -= 1
+            if x - 1 > 0:
+                x -= 1
         elif action == Actions.East:
-            x += 1
+            if x + 1 < self.max_x:
+                x += 1
 
-        # make sure the move stays on the grid
+        """ # make sure the move stays on the grid
         if x < 0:
             x = 0
         if y < 0:
@@ -60,7 +70,7 @@ class Agent:
             x = self.max_x
         if y > self.max_y:
             y = self.max_y
-
+"""
         return [x, y]
 
     def take_action(self, action):
@@ -71,21 +81,27 @@ class Agent:
             if self.x == 0 and self.y == 2:
                 rand = uniform(0, 1)
                 if rand < 0.5:
-                    self.y -= 1
+                    if self.y - 1 >= 0:
+                        self.y -= 1
             elif self.x == 2 and self.y == 2:
                 rand = uniform(0, 1)
                 if rand < 0.5:
-                    self.y -= 1
+                    if self.y - 1 >= 0:
+                        self.y -= 1
             else:
-                self.y -= 1
+                if self.y - 1 >= 0:
+                    self.y -= 1
         elif action == Actions.South:
-            self.y += 1
+            if self.y + 1 <= self.max_y:
+                self.y += 1
         elif action == Actions.West:
-            self.x -= 1
+            if self.x - 1 >= 0:
+                self.x -= 1
         elif action == Actions.East:
-            self.x += 1
+            if self.x + 1 <= self.max_x:
+                self.x += 1
 
-        # make sure the move stays on the grid
+        """ # make sure the move stays on the grid
         if self.x < 0:
             self.x = 0
         if self.y < 0:
@@ -93,7 +109,7 @@ class Agent:
         if self.x > self.max_x:
             self.x = self.max_x
         if self.y > self.max_y:
-            self.y = self.max_y
+            self.y = self.max_y"""
 
     # get the enum name without the class
     def __str__(self):
@@ -144,6 +160,9 @@ class BabyRobotEnv_v1(gym.Env):
         self.x2 = self.max_x
         self.y2 = self.max_y
 
+        # print(f"Position of agent 1 : {[self.x1,self.y1]}")
+        # print(f"Position of agent 2 : {[self.x2,self.y2]}")
+
         return np.array([self.x1, self.y1, self.x2, self.y2])
 
     def render(self, mode):
@@ -181,6 +200,19 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
         self.agents.append(Agent(startx=self.x1, starty=self.y1, env=self))
         self.agents.append(Agent(startx=self.x2, starty=self.y2, env=self))
 
+    def reset(self):
+        # reset Baby Robot's position in the grid
+        self.agents[0].x = self.start1[0]
+        self.agents[0].y = self.start1[1]
+
+        self.agents[1].x = self.max_x
+        self.agents[1].y = self.max_y
+
+        print(f"Position of agent 1 : {[self.x1,self.y1]}")
+        print(f"Position of agent 2 : {[self.x2,self.y2]}")
+
+        return np.array([self.x1, self.y1, self.x2, self.y2])
+
     def step(self, action1, action2):
 
         next_positions = []
@@ -201,6 +233,7 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
         else:
             self.agents[0].take_action(action1)
             self.agents[1].take_action(action2)
+
         # set the 'done' flag if we've reached the exit
         done1 = self.agents[0].x == self.end[0] and self.agents[0].y == self.end[1]
         done2 = self.agents[1].x == self.end[0] and self.agents[1].y == self.end[1]
@@ -210,8 +243,11 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
         reward1 = 0 if done1 else -1
         reward2 = 0 if done2 else -1
 
+        # print(f"Agent 1 x : {self.agents[0].x} y : {self.agents[0].y}")
+        # print(f"Agent 2 x : {self.agents[1].x} y : {self.agents[1].y}")
+
         obs1 = [self.agents[0].x, self.agents[0].y]
-        obs2 = [self.agents[0].x, self.agents[0].y]
+        obs2 = [self.agents[1].x, self.agents[1].y]
 
         info = {}
 
@@ -230,28 +266,56 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
             super().render(mode=mode)  # just raise an exception
 
 
-# create an instance of our custom environment
 env = BabyRobotEnv_v2()
 
-# initialize the environment
+"""for i in range(0, 10):
+
+    # initialize the environment
+    env.reset()
+
+    done = False
+    while not done:
+
+        # choose a random action
+        action1 = env.action_space.sample()
+        action2 = env.action_space.sample()
+
+        # take the action and get the information from the environment
+        new_state1, new_state2, reward1, reward2, done, info = env.step(
+            action1=action1, action2=action2
+        )
+
+        # show the current position and reward
+        env.render(action1=action1, action2=action2, reward1=reward1, reward2=reward2)
+
+        print(f" Cumulative rew of agent 1 : {env.agents[0].cum_rew}")
+        print(f" Cumulative rew of agent 2 : {env.agents[1].cum_rew}")"""
+
+
 env.reset()
+for i in range(0, 10):
+    env.reset()
 
-done = False
-while not done:
+    env.agents[0].cum_rew = 0
+    env.agents[1].cum_rew = 0
+    done = False
+    while not done:
 
-    # choose a random action
-    action1 = env.action_space.sample()
-    action2 = env.action_space.sample()
+        # choose a random action
+        action1 = env.action_space.sample()
+        action2 = env.action_space.sample()
 
-    # take the action and get the information from the environment
-    new_state1, new_state2, reward1, reward2, done, info = env.step(
-        action1=action1, action2=action2
-    )
+        # take the action and get the information from the environment
+        new_state1, new_state2, reward1, reward2, done, info = env.step(
+            action1=action1, action2=action2
+        )
 
-    env.agents[0].cum_rew += reward1
-    env.agents[1].cum_rew += reward2
+        env.agents[0].cum_rew += reward1
+        env.agents[1].cum_rew += reward2
 
-    # show the current position and reward
-    env.render(action1=action1, action2=action2, reward1=reward1, reward2=reward2)
-print(f"Cumulative reward of agent1 = {env.agents[0].cum_rew}")
-print(f"Cumulative reward of agent2 = {env.agents[1].cum_rew}")
+        # show the current position and reward
+        env.render(action1=action1, action2=action2, reward1=reward1, reward2=reward2)
+    print(f"Cumulative reward of agent1 = {env.agents[0].cum_rew}")
+    print(f"Cumulative reward of agent2 = {env.agents[1].cum_rew}")
+    print(" ")
+    print(" ")
