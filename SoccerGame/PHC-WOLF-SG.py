@@ -15,7 +15,7 @@ delta_w = 0.00001
 delta_l = 0.00004
 NumberOfStates = 24
 NumberOfActions = 5
-Iterations = 1000000
+Iterations = 10000
 gamma = 0.9
 RUN = 1
 
@@ -350,7 +350,7 @@ for run in range(0, RUN):
 
         # print(f" ")
         # print(f" Cumulative rew of agent 1 {env.agents[0].cum_rew}")
-        if env.agents[0].has_ball:
+        if env.winner == 1:
             wins_agent1 += 1
         else:
             wins_agent12 += 1

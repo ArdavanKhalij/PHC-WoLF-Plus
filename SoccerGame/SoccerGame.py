@@ -135,6 +135,7 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        self.winner = 0
         # the start and end positions in the grid
         # - by default these are the top-left and bottom-right respectively
         self.start1 = kwargs.get(
@@ -288,10 +289,12 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
             reward1 = 10
             reward2 = -10
             done1 = True
+            self.winner = 1
         elif scoring_agent == 1:
             reward2 = 10
             reward1 = -10
             done2 = True
+            self.winner = 2
         else:
             reward1 = 0
             reward2 = 0
