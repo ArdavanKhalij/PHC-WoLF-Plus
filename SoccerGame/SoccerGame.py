@@ -32,36 +32,49 @@ class Agent:
 
         self.has_ball = False
 
+    def next_pos(self, action):
+        x = copy(self.x)
+        y = copy(self.y)
+
+        if action == Actions.North:
+            if y - 1 >= 0:
+                y -= 1
+        elif action == Actions.South:
+            if y + 1 < self.max_y:
+                y += 1
+        elif action == Actions.West:
+            if x - 1 > 0:
+                x -= 1
+        elif action == Actions.East:
+            if x + 1 < self.max_x:
+                x += 1
+
+        return [x, y]
+
     def take_action(self, action):
         """apply the supplied action"""
 
         # move in the direction of the specified action
         if action == Actions.North:
-            if self.x == 0 and self.y == 2:
-                rand = uniform(0, 1)
-                if rand < 0.5:
-                    if self.y - 1 >= 0:
-                        self.y -= 1
-            elif self.x == 2 and self.y == 2:
-                rand = uniform(0, 1)
-                if rand < 0.5:
-                    if self.y - 1 >= 0:
-                        self.y -= 1
-            else:
-                if self.y - 1 >= 0:
-                    self.y -= 1
+            if self.y - 1 >= 0:
+                self.y -= 1
         elif action == Actions.South:
             if self.y + 1 <= self.max_y:
                 self.y += 1
         elif action == Actions.West:
             if self.x - 1 >= 0:
                 self.x -= 1
-            elif self.x == 0 and self.y > 0 and self.y < 3:
+            elif self.x == 0 and self.y > 0 and self.y < 3 and self == env.agents[1]:
                 self.x -= 1
         elif action == Actions.East:
             if self.x + 1 <= self.max_x:
                 self.x += 1
-            elif self.x == self.max_x and self.y > 0 and self.y < 3:
+            elif (
+                self.x == self.max_x
+                and self.y > 0
+                and self.y < 3
+                and self == env.agents[0]
+            ):
                 self.x += 1
 
 
@@ -188,6 +201,69 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
             self.agents[1].has_ball = False
             self.agents[0].has_ball = True
 
+    def make_moves(self, first):
+        if first == 0:
+            # Agent 1 plays first
+            if self.agents[0].has_ball:
+                if self.agents[0].next_pos(action1) == [
+                    self.agents[1].x,
+                    self.agents[1].y,
+                ]:  # Check if the agent tries to move to a defender
+                    self.change_posession()
+                    # Give the posession to the defender
+                else:
+                    self.agents[0].take_action(action1)
+                    if self.agents[1].next_pos(action2) != [
+                        self.agents[0].x,
+                        self.agents[0].y,
+                    ]:  # Check if the agent tries to a valid place
+                        self.agents[1].take_action(action1)
+                        # Make the move
+
+            else:
+                if self.agents[0].next_pos(action1) != [
+                    self.agents[1].x,
+                    self.agents[1].y,
+                ]:
+                    self.agents[0].take_action(action1)
+                    if self.agents[1].next_pos(action2) == [
+                        self.agents[0].x,
+                        self.agents[0].y,
+                    ]:  # Check if the agent tries to move to a defender
+                        self.change_posession()
+                    else:
+                        self.agents[1].take_action(action2)
+
+        else:
+            if self.agents[0].next_pos(action1) != [
+                self.agents[1].x,
+                self.agents[1].y,
+            ]:
+                self.agents[0].take_action(action1)
+                if self.agents[1].next_pos(action2) == [
+                    self.agents[0].x,
+                    self.agents[0].y,
+                ]:  # Check if the agent tries to move to a defender
+                    self.change_posession()
+                else:
+                    self.agents[1].take_action(action2)
+            else:
+                if self.agents[0].has_ball:
+                    if self.agents[0].next_pos(action1) == [
+                        self.agents[1].x,
+                        self.agents[1].y,
+                    ]:  # Check if the agent tries to move to a defender
+                        self.change_posession()
+                        # Give the posession to the defender
+                    else:
+                        self.agents[0].take_action(action1)
+                        if self.agents[1].next_pos(action2) != [
+                            self.agents[0].x,
+                            self.agents[0].y,
+                        ]:  # Check if the agent tries to a valid place
+                            self.agents[1].take_action(action2)
+                            # Make the move
+
     def check_agents(self):
         # Check if agents end up in the same spot and change the possession of the ball if needed
         if self.same_pos():
@@ -205,15 +281,7 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
 
         first_to_move = randint(0, 1)
 
-        if first_to_move == 0:
-            self.agents[0].take_action(action1)
-            self.agents[1].take_action(action2)
-        else:
-            self.agents[1].take_action(action2)
-            self.agents[0].take_action(action1)
-
-        # Check if agents end up in the same spot and change the possession of the ball if needed
-        self.check_agents()
+        self.make_moves(first_to_move)
 
         # set the 'done' flag if one of the agents has scoared a goal
         scoring_agent = self.check_goal()
@@ -227,8 +295,8 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
             reward1 = -10
             done2 = True
         else:
-            reward1 = -1
-            reward2 = -1
+            reward1 = 0
+            reward2 = 0
 
         # print(f"Agent 1 x : {self.agents[0].x} y : {self.agents[0].y}")
         # print(f"Agent 2 x : {self.agents[1].x} y : {self.agents[1].y}")
