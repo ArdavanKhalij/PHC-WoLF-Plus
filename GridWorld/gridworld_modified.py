@@ -18,7 +18,7 @@ Iterations = 10000
 gamma = 0.99
 RUN = 1
 
-AVERAGEEVERY = 1
+AVERAGEEVERY = 2
 ############################################################################
 
 
@@ -26,8 +26,12 @@ AVERAGEEVERY = 1
 # Variables for plotting
 p_of_head_1 = []
 p_of_head_2 = []
+p_of_head_3 = []
+p_of_head_4 = []
 p = []
 p2 = []
+p3 = []
+p4 = []
 ############################################################################
 
 
@@ -309,34 +313,20 @@ for run in range(0, RUN):
 
         # print(f" ")
         # print(f" Cumulative rew of agent 1 {env.agents[0].cum_rew}")
-        p2.append(Policy2[2][0])
-        p.append(Policy2[2][3])
+        p.append(Policy1[0][1])
+        p2.append(Policy1[0][0])
+        p3.append(Policy2[2][3])
+        p4.append(Policy2[2][0])
         # p.append(env.agents[0].cum_rew)
 
     p_of_head_1.append(p)
     p_of_head_2.append(p2)
+    p_of_head_3.append(p3)
+    p_of_head_4.append(p4)
     p = []
     p2 = []
-    Policy1 = []
-    for i in range(0, NumberOfStates):
-        Policy1.append([])
-        for j in range(0, NumberOfActions):
-            Policy1[i].append(1 / NumberOfActions)
-    Policy2 = []
-    for i in range(0, NumberOfStates):
-        Policy2.append([])
-        for j in range(0, NumberOfActions):
-            Policy2[i].append(1 / NumberOfActions)
-    Q1 = []
-    for i in range(0, NumberOfStates):
-        Q1.append([])
-        for j in range(0, NumberOfActions):
-            Q1[i].append(0)
-    Q2 = []
-    for i in range(0, NumberOfStates):
-        Q2.append([])
-        for j in range(0, NumberOfActions):
-            Q2[i].append(0)
+    p3 = []
+    p4 = []
 ############################################################################
 
 
@@ -344,6 +334,8 @@ for run in range(0, RUN):
 # Plotting
 plottingx = []
 plottingy = []
+plottingx2 = []
+plottingy2 = []
 # print(len(p_of_head_1[0]))
 for i in range(0, len(p_of_head_1[0]), AVERAGEEVERY):
     x = []
@@ -352,20 +344,44 @@ for i in range(0, len(p_of_head_1[0]), AVERAGEEVERY):
         x.append(avgOf300)
     plottingx.append(sum(x) / len(x))
 
-
 for i in range(0, len(p_of_head_2[0]), AVERAGEEVERY):
     x = []
-    for j in range(0, len(p_of_head_1)):
+    for j in range(0, len(p_of_head_2)):
         avgOf300 = sum(p_of_head_2[j][i:i + AVERAGEEVERY]) / len(p_of_head_2[j][i:i + AVERAGEEVERY])
         x.append(avgOf300)
     plottingy.append(sum(x) / len(x))
 
-plt.plot(plottingx[:200], plottingy[:200], color='red')
-plt.plot(plottingx[200:], plottingy[200:], color='green')
-plt.xlabel("Probabilty of the West")
-plt.ylabel("Probabilty of the North")
-# plt.xlim(0, 1)
-# plt.ylim(0, 1)
+for i in range(0, len(p_of_head_3[0]), AVERAGEEVERY):
+    x = []
+    for j in range(0, len(p_of_head_3)):
+        avgOf300 = sum(p_of_head_3[j][i:i + AVERAGEEVERY]) / len(p_of_head_3[j][i:i + AVERAGEEVERY])
+        x.append(avgOf300)
+    plottingx2.append(sum(x) / len(x))
+
+for i in range(0, len(p_of_head_4[0]), AVERAGEEVERY):
+    x = []
+    for j in range(0, len(p_of_head_4)):
+        avgOf300 = sum(p_of_head_4[j][i:i + AVERAGEEVERY]) / len(p_of_head_4[j][i:i + AVERAGEEVERY])
+        x.append(avgOf300)
+    plottingy2.append(sum(x) / len(x))
+
+fig, (ax1, ax2) = plt.subplots(2)
+# Plot1
+ax1.plot(plottingx[:200], plottingy[:200], color='red')
+ax1.plot(plottingx[200:], plottingy[200:], color='green')
+ax1.set_title("Probability of the East")
+# ax1.xlabel("Probabilty of the East")
+# ax1.ylabel("Probabilty of the North")
+# ax1.xlim(0, 1)
+# ax1.ylim(0, 1)
+# Plot2
+ax2.plot(plottingx2[:200], plottingy2[:200], color='red')
+ax2.plot(plottingx2[200:], plottingy2[200:], color='green')
+ax2.set_title("Probability of the West")
+# ax2.xlabel("Probabilty of the West")
+# ax2.ylabel("Probabilty of the North")
+# ax2.xlim(0, 1)
+# ax2.ylim(0, 1)
 # plt.plot(p_of_head_1[0])
 #plt.plot(p_of_head_2, color="red")
 plt.show()
