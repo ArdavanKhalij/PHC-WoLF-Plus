@@ -1,0 +1,10 @@
+alpha = 0.01
+delta_w = 0.0001
+delta_l = 0.0004
+NumberOfStates = 9
+NumberOfActions = 4
+Iterations = 10000
+gamma = 0.99
+RUN = 1
+
+AVERAGEEVERY = 1
