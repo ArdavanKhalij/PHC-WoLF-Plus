@@ -12,16 +12,16 @@ import statistics
 # Data of the problem
 alpha = 1
 alpha_decay = 0.0000004
-delta_w = 0.00001
-delta_l = 0.00004
+delta_w = 0.000001
+delta_l = 0.000004
 NumberOfStates = 24
 NumberOfActions = 5
-Iterations = 10000
+Iterations = 2000000
 LearnAfter = 1000000
 gamma = 0.9
 RUN = 1
 
-AVERAGEEVERY = 1
+AVERAGEEVERY = 50000
 ############################################################################
 
 
@@ -227,7 +227,9 @@ for run in range(0, RUN):
                 action1 = np.random.choice(range(0, NumberOfActions), p=Policy1[state1])
                 action2 = np.random.choice(range(0, NumberOfActions), p=Policy2[state2])
                 # Get rewards and new state
-                new_state1, new_state2, reward1, reward2, done, info = env.step(action1=action1, action2=action2)
+                new_state1, new_state2, reward1, reward2, done, info = env.step(
+                    action1=action1, action2=action2
+                )
                 new_state1 = convert_to_state(new_state1[0], new_state1[1])
                 new_state2 = convert_to_state(new_state2[0], new_state2[1])
 
@@ -331,16 +333,18 @@ for run in range(0, RUN):
                 action1 = np.random.choice(range(0, NumberOfActions), p=Policy1[state1])
                 action2 = np.random.choice(range(0, NumberOfActions), p=Policy2[state2])
                 # Get rewards and new state
-                new_state1, new_state2, reward1, reward2, done, info = env.step(action1=action1, action2=action2)
+                new_state1, new_state2, reward1, reward2, done, info = env.step(
+                    action1=action1, action2=action2
+                )
                 new_state1 = convert_to_state(new_state1[0], new_state1[1])
                 new_state2 = convert_to_state(new_state2[0], new_state2[1])
 
                 # Update Q table
                 Q1[state1][action1] = ((1 - alpha) * Q1[state1][action1]) + (
-                        alpha * (reward1 + gamma * max(Q1[new_state1]))
+                    alpha * (reward1 + gamma * max(Q1[new_state1]))
                 )
                 Q2[state2][action2] = ((1 - alpha) * Q2[state2][action2]) + (
-                        alpha * (reward2 + gamma * max(Q2[new_state2]))
+                    alpha * (reward2 + gamma * max(Q2[new_state2]))
                 )
 
                 QPrim1 = Q1[state1]
@@ -350,7 +354,7 @@ for run in range(0, RUN):
                 C1[state1] = C1[state1] + 1
                 for k in range(0, NumberOfActions):
                     Average_Policy1[state1][k] = Average_Policy1[state1][k] + (
-                            1 / C1[state1]
+                        1 / C1[state1]
                     ) * (Policy1[state1][k] - Average_Policy1[state1][k])
                 # Update policy
                 delta1, delta2 = get_delta(s1=state1, s2=state2)
@@ -361,19 +365,19 @@ for run in range(0, RUN):
                             for k in range(0, NumberOfActions):
                                 if k != action1:
                                     Policy1[state1][k] = Policy1[state1][k] - (
-                                            delta1 / (NumberOfActions - 1)
+                                        delta1 / (NumberOfActions - 1)
                                     )
                 else:
                     if Policy1[state1][action1] >= delta1:
                         if max(Policy1[state1]) <= 1 - (delta1 / (NumberOfStates - 1)):
                             Policy1[state1][action1] = Policy1[state1][action1] - (
-                                    delta1 / (NumberOfActions - 1)
+                                delta1 / (NumberOfActions - 1)
                             )
                             for k in range(0, NumberOfActions):
                                 if k != action1:
                                     Policy1[state1][k] = Policy1[state1][k] + (
-                                            (delta1 / (NumberOfActions - 1))
-                                            / (NumberOfActions - 1)
+                                        (delta1 / (NumberOfActions - 1))
+                                        / (NumberOfActions - 1)
                                     )
 
                 state1 = new_state1
@@ -384,9 +388,9 @@ for run in range(0, RUN):
                 wins_agent1.append(1)
             else:
                 wins_agent1.append(2)
-            if i % 50000 == 0:
+            if i % AVERAGEEVERY == 0:
                 wins_agent12.append(wins_agent1)
-
+                wins_agent1 = []
             alpha -= alpha_decay
 ############################################################################
 
@@ -395,10 +399,21 @@ for run in range(0, RUN):
 # Result
 ListOfResults = []
 for i in range(0, len(wins_agent12)):
+
+    # print(len(wins_agent12[i]))
     numberOf1 = wins_agent12[i].count(1)
     numberOf2 = wins_agent12[i].count(2)
-    ListOfResults.append(numberOf1 / (numberOf1 + numberOf2))
 
+    # print(f"Win of agent 1: {numberOf1}")
+    # print(f"Win of agent 2: {numberOf2}")
+    if i == 0:
+        ListOfResults.append(0.5)
+    else:
+        ListOfResults.append(numberOf1 / (numberOf1 + numberOf2))
+
+plt.plot(ListOfResults)
+plt.ylabel("Probability of winning")
+plt.xlabel("Iterations (averaged every 50 000)")
 print(f"Probability of winning for agent1 : {sum(ListOfResults)/len(ListOfResults)}")
 print(f"Standard Deviation of agent 1 : {statistics.stdev(ListOfResults)}")
 ############################################################################

@@ -329,32 +329,32 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
             super().render(mode=mode)  # just raise an exception
 
 
-env = BabyRobotEnv_v2()
+# env = BabyRobotEnv_v2()
 
-env.reset()
-for i in range(0, 10):
-    env.reset()
+# env.reset()
+# for i in range(0, 10):
+#     env.reset()
 
-    env.agents[0].cum_rew = 0
-    env.agents[1].cum_rew = 0
-    done = False
-    while not done:
+#     env.agents[0].cum_rew = 0
+#     env.agents[1].cum_rew = 0
+#     done = False
+#     while not done:
 
-        # choose a random action
-        action1 = env.action_space.sample()
-        action2 = env.action_space.sample()
+#         # choose a random action
+#         action1 = env.action_space.sample()
+#         action2 = env.action_space.sample()
 
-        # take the action and get the information from the environment
-        new_state1, new_state2, reward1, reward2, done, info = env.step(
-            action1=action1, action2=action2
-        )
+#         # take the action and get the information from the environment
+#         new_state1, new_state2, reward1, reward2, done, info = env.step(
+#             action1=action1, action2=action2
+#         )
 
-        env.agents[0].cum_rew += reward1
-        env.agents[1].cum_rew += reward2
+#         env.agents[0].cum_rew += reward1
+#         env.agents[1].cum_rew += reward2
 
-        # show the current position and reward
-        env.render(action1=action1, action2=action2, reward1=reward1, reward2=reward2)
-    print(f"Cumulative reward of agent1 = {env.agents[0].cum_rew}")
-    print(f"Cumulative reward of agent2 = {env.agents[1].cum_rew}")
-    print(" ")
-    print(" ")
+#         # show the current position and reward
+#         env.render(action1=action1, action2=action2, reward1=reward1, reward2=reward2)
+#     print(f"Cumulative reward of agent1 = {env.agents[0].cum_rew}")
+#     print(f"Cumulative reward of agent2 = {env.agents[1].cum_rew}")
+#     print(" ")
+#     print(" ")
