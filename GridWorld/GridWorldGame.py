@@ -61,16 +61,6 @@ class Agent:
             if x + 1 < self.max_x:
                 x += 1
 
-        """ # make sure the move stays on the grid
-        if x < 0:
-            x = 0
-        if y < 0:
-            y = 0
-        if x > self.max_x:
-            x = self.max_x
-        if y > self.max_y:
-            y = self.max_y
-"""
         return [x, y]
 
     def take_action(self, action):

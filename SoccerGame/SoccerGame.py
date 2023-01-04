@@ -32,6 +32,8 @@ class Agent:
 
         self.has_ball = False
 
+        self.env = env
+
     def next_pos(self, action):
         x = copy(self.x)
         y = copy(self.y)
@@ -64,17 +66,12 @@ class Agent:
         elif action == Actions.West:
             if self.x - 1 >= 0:
                 self.x -= 1
-            elif self.x == 0 and self.y > 0 and self.y < 3 and self == env.agents[1]:
+            elif self.x == 0 and self.y > 0 and self.y < 3 and self.has_ball:
                 self.x -= 1
         elif action == Actions.East:
             if self.x + 1 <= self.max_x:
                 self.x += 1
-            elif (
-                self.x == self.max_x
-                and self.y > 0
-                and self.y < 3
-                and self == env.agents[0]
-            ):
+            elif self.x == self.max_x and self.y > 0 and self.y < 3 and self.has_ball:
                 self.x += 1
 
 
@@ -169,8 +166,8 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
         self.agents[1].x = randint(self.max_x / 2, self.max_x)
         self.agents[1].y = randint(0, self.max_y)
 
-        print(f"Position of agent 1 : {[self.agents[0].x,self.agents[0].y]}")
-        print(f"Position of agent 2 : {[self.agents[1].x,self.agents[1].y]}")
+        # print(f"Position of agent 1 : {[self.agents[0].x,self.agents[0].y]}")
+        # print(f"Position of agent 2 : {[self.agents[1].x,self.agents[1].y]}")
 
         rand = randint(0, 1)
 
@@ -201,7 +198,7 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
             self.agents[1].has_ball = False
             self.agents[0].has_ball = True
 
-    def make_moves(self, first):
+    def make_moves(self, first, action1, action2):
         if first == 0:
             # Agent 1 plays first
             if self.agents[0].has_ball:
@@ -270,10 +267,11 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
             self.change_posession()
 
     def check_goal(self):
-        if self.agents[0].x > self.max_x and self.agents[0].has_ball:
-            return 0
-        elif self.agents[1].x < 0 and self.agents[1].has_ball:
-            return 1
+        for agent in self.agents:
+            if agent.x > self.max_x:
+                return 0
+            elif agent.x < 0:
+                return 1
 
     def step(self, action1, action2):
 
@@ -281,7 +279,7 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
 
         first_to_move = randint(0, 1)
 
-        self.make_moves(first_to_move)
+        self.make_moves(first_to_move, action1, action2)
 
         # set the 'done' flag if one of the agents has scoared a goal
         scoring_agent = self.check_goal()
@@ -306,6 +304,8 @@ class BabyRobotEnv_v2(BabyRobotEnv_v1):
 
         info = {}
 
+        # print(f"obs1 : {obs1}")
+        # print(f"obs2 : {obs2}")
         done = done1 or done2
         return obs1, obs2, reward1, reward2, done, info
 

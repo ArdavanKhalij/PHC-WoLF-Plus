@@ -10,16 +10,16 @@ import SoccerGame as sg
 ############################################################################
 # Data of the problem
 alpha = 1
-# delta = 0.00001
+alpha_decay = 0.0000001
 delta_w = 0.00001
 delta_l = 0.00004
 NumberOfStates = 24
 NumberOfActions = 5
-Iterations = 100000
+Iterations = 1000000
 gamma = 0.9
 RUN = 1
 
-AVERAGEEVERY = 100
+AVERAGEEVERY = 1
 ############################################################################
 
 
@@ -31,7 +31,7 @@ p = []
 p2 = []
 
 wins_agent1 = 0
-wins_agent2 = 0
+wins_agent12 = 0
 ############################################################################
 
 
@@ -54,11 +54,30 @@ for i in range(0, NumberOfStates):
 # Creating policy table
 
 
+# Policy1 = [[0.4, 0.2, 0.2, 0.2],
+#            [0.25, 0.25, 0.25, 0.25],
+#            [0.25, 0.25, 0.25, 0.25],
+#            [0.25, 0.25, 0.25, 0.25],
+#            [0.25, 0.25, 0.25, 0.25],
+#            [0.25, 0.25, 0.25, 0.25],
+#            [0.25, 0.25, 0.25, 0.25],
+#            [0.25, 0.25, 0.25, 0.25]]
+
 Policy1 = []
 for i in range(0, NumberOfStates):
     Policy1.append([])
     for j in range(0, NumberOfActions):
         Policy1[i].append(1 / NumberOfActions)
+
+# Policy2 = [[0.25, 0.25, 0.25, 0.25],
+#            [0.25, 0.25, 0.25, 0.25],
+#            [0.4, 0.2, 0.2, 0.2],
+#            [0.25, 0.25, 0.25, 0.25],
+#            [0.25, 0.25, 0.25, 0.25],
+#            [0.25, 0.25, 0.25, 0.25],
+#            [0.25, 0.25, 0.25, 0.25],
+#            [0.25, 0.25, 0.25, 0.25]]
+
 Policy2 = []
 for i in range(0, NumberOfStates):
     Policy2.append([])
@@ -218,10 +237,23 @@ for run in range(0, RUN):
         # Find the initial state of the agents
         state1 = convert_to_state(env.agents[0].x, env.agents[0].y)
         state2 = convert_to_state(env.agents[1].x, env.agents[1].y)
-
         while not done:
 
             # Choose Action
+            if min(Policy1[state1]) < 0:
+                for k in range(0, NumberOfActions):
+                    Policy1[state1][k] = Policy1[state1][k] - min(Policy1[state1])
+                sum1 = sum(Policy1[state1])
+                for k in range(0, NumberOfActions):
+                    Policy1[state1][k] = Policy1[state1][k] / sum1
+            if min(Policy2[state2]) < 0:
+                for k in range(0, NumberOfActions):
+                    Policy2[state2][k] = Policy2[state2][k] - min(Policy2[state2])
+                sum2 = sum(Policy2[state2])
+                for k in range(0, NumberOfActions):
+                    Policy2[state2][k] = Policy2[state2][k] / sum2
+            # print(sum(Policy1[state1]))
+            # print(sum(Policy1[state2]))
             action1 = np.random.choice(range(0, NumberOfActions), p=Policy1[state1])
             action2 = np.random.choice(range(0, NumberOfActions), p=Policy2[state2])
 
@@ -232,6 +264,9 @@ for run in range(0, RUN):
             new_state1, new_state2, reward1, reward2, done, info = env.step(
                 action1=action1, action2=action2
             )
+
+            # print(f"new_state1 before conv is : {new_state1}")
+            # print(f"new_state2 before conv is : {new_state2}")
 
             new_state1 = convert_to_state(new_state1[0], new_state1[1])
             new_state2 = convert_to_state(new_state2[0], new_state2[1])
@@ -307,19 +342,22 @@ for run in range(0, RUN):
 
             state1 = new_state1
             state2 = new_state2
-
             env.agents[0].cum_rew += reward1
             env.agents[1].cum_rew += reward2
-            env.render(
-                action1=action1, action2=action2, reward1=reward1, reward2=reward2
-            )
+            # env.render(
+            #     action1=action1, action2=action2, reward1=reward1, reward2=reward2
+            # )
+
+        # print(f" ")
+        # print(f" Cumulative rew of agent 1 {env.agents[0].cum_rew}")
         if env.agents[0].has_ball:
             wins_agent1 += 1
         else:
-            wins_agent2 += 1
-        print(f" ")
-        print(f" Cumulative rew of agent 1 {env.agents[0].cum_rew}")
-        p.append(env.agents[0].cum_rew)
+            wins_agent12 += 1
+        p2.append(Policy2[2][0])
+        p.append(Policy2[2][3])
+        # p.append(env.agents[0].cum_rew)
+        alpha -= alpha_decay
 
     p_of_head_1.append(p)
     p_of_head_2.append(p2)
@@ -349,42 +387,39 @@ for run in range(0, RUN):
 
 
 ############################################################################
-# Plotting
-"""plottingx = []
-plottingy = []
-# print(len(p_of_head_1[0]))
-for i in range(0, len(p_of_head_1[0]), AVERAGEEVERY):
-    x = []
-    for j in range(0, len(p_of_head_1)):
-        avgOf300 = sum(p_of_head_1[j][i : i + AVERAGEEVERY]) / len(
-            p_of_head_1[j][i : i + 1]
-        )
-        x.append(avgOf300)
-    plottingx.append(sum(x) / len(x))
+# # Plotting
+# plottingx = []
+# plottingy = []
+# # print(len(p_of_head_1[0]))
+# for i in range(0, len(p_of_head_1[0]), AVERAGEEVERY):
+#     x = []
+#     for j in range(0, len(p_of_head_1)):
+#         avgOf300 = sum(p_of_head_1[j][i : i + AVERAGEEVERY]) / len(
+#             p_of_head_1[j][i : i + AVERAGEEVERY]
+#         )
+#         x.append(avgOf300)
+#     plottingx.append(sum(x) / len(x))
 
 
-for i in range(0, len(p_of_head_2[0]), AVERAGEEVERY):
-    x = []
-    for j in range(0, len(p_of_head_1)):
-        avgOf300 = sum(p_of_head_2[j][i : i + AVERAGEEVERY]) / len(
-            p_of_head_2[j][i : i + AVERAGEEVERY]
-        )
-        x.append(avgOf300)
-    plottingy.append(sum(x) / len(x))"""
-
+# for i in range(0, len(p_of_head_2[0]), AVERAGEEVERY):
+#     x = []
+#     for j in range(0, len(p_of_head_1)):
+#         avgOf300 = sum(p_of_head_2[j][i : i + AVERAGEEVERY]) / len(
+#             p_of_head_2[j][i : i + AVERAGEEVERY]
+#         )
+#         x.append(avgOf300)
+#     plottingy.append(sum(x) / len(x))
 
 # plt.plot(plottingx[:200], plottingy[:200], color="red")
-# plt.plot(p_of_head_1[0])
-# plt.plot(p_of_head_2, color="red")
-
 # plt.plot(plottingx[200:], plottingy[200:], color="green")
+# plt.xlabel("Probabilty of the West")
+# plt.ylabel("Probabilty of the North")
+# # plt.xlim(0, 1)
+# # plt.ylim(0, 1)
+# # plt.plot(p_of_head_1[0])
+# # plt.plot(p_of_head_2, color="red")
+# plt.show()
 
-"""plt.plot(plottingx)
+print(f"Probability of winning for agent1 : {wins_agent1/Iterations}")
 
-plt.xlabel("Pr(Rock)")
-plt.ylabel("Pr(Paper)")
-plt.show()"""
-
-
-print(wins_agent1 / (wins_agent2 + wins_agent1))
 ############################################################################
