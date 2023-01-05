@@ -14,9 +14,9 @@ alpha_decay = 0.0000004
 delta = 0.000001
 NumberOfStates = 24
 NumberOfActions = 5
-Iterations = 12500
-LearnAfter = 10000
-resultEvery = 500
+Iterations = 1250000
+LearnAfter = 1000000
+resultEvery = 50000
 gamma = 0.9
 RUN = 1
 AVERAGEEVERY = 1
@@ -159,33 +159,33 @@ for run in range(0, RUN):
                 QPrim2 = Q2[state2]
                 # Update policy
                 if action1 == QPrim1.index(max(QPrim1)):
-                    if Policy1[j][action1] <= 1 - delta:
-                        if min(Policy2[j]) >= (delta / (NumberOfStates - 1)):
-                            Policy1[j][action1] = Policy1[j][action1] + delta
+                    if Policy1[state1][action1] <= 1 - delta:
+                        if min(Policy1[state1]) >= (delta / (NumberOfStates - 1)):
+                            Policy1[state1][action1] = Policy1[state1][action1] + delta
                             for k in range(0, NumberOfActions):
                                 if k != action1:
-                                    Policy1[j][k] = Policy1[j][k] - (delta/(NumberOfActions - 1))
+                                    Policy1[state1][k] = Policy1[state1][k] - (delta/(NumberOfActions - 1))
                 else:
-                    if Policy1[j][action1] >= delta:
-                        if max(Policy1[j]) <= 1 - (delta / (NumberOfStates - 1)):
-                            Policy1[j][action1] = Policy1[j][action1] - (delta / (NumberOfActions - 1))
+                    if Policy1[state1][action1] >= delta:
+                        if max(Policy1[state1]) <= 1 - (delta / (NumberOfStates - 1)):
+                            Policy1[state1][action1] = Policy1[state1][action1] - (delta / (NumberOfActions - 1))
                             for k in range(0, NumberOfActions):
                                 if k != action1:
-                                    Policy1[j][k] = Policy1[j][k] + ((delta / (NumberOfActions - 1))/(NumberOfActions - 1))
+                                    Policy1[state1][k] = Policy1[state1][k] + ((delta / (NumberOfActions - 1))/(NumberOfActions - 1))
                 if action2 == QPrim2.index(max(QPrim2)):
-                    if Policy2[j][action2] <= 1 - delta:
-                        if min(Policy2[j]) >= (delta / (NumberOfStates - 1)):
-                            Policy2[j][action2] = Policy2[j][action2] + delta
+                    if Policy2[state2][action2] <= 1 - delta:
+                        if min(Policy2[state2]) >= (delta / (NumberOfStates - 1)):
+                            Policy2[state2][action2] = Policy2[state2][action2] + delta
                             for k in range(0, NumberOfActions):
                                 if k != action2:
-                                    Policy2[j][k] = Policy2[j][k] - (delta/(NumberOfActions - 1))
+                                    Policy2[state2][k] = Policy2[state2][k] - (delta/(NumberOfActions - 1))
                 else:
-                    if Policy2[j][action2] >= delta:
-                        if max(Policy2[j]) <= 1 - (delta / (NumberOfStates - 1)):
-                            Policy2[j][action2] = Policy2[j][action2] - (delta/(NumberOfActions - 1))
+                    if Policy2[state2][action2] >= delta:
+                        if max(Policy2[state2]) <= 1 - (delta / (NumberOfStates - 1)):
+                            Policy2[state2][action2] = Policy2[state2][action2] - (delta/(NumberOfActions - 1))
                             for k in range(0, NumberOfActions):
                                 if k != action2:
-                                    Policy2[j][k] = Policy2[j][k] + ((delta / (NumberOfActions - 1))/(NumberOfActions - 1))
+                                    Policy2[state2][k] = Policy2[state2][k] + ((delta / (NumberOfActions - 1))/(NumberOfActions - 1))
                 state1 = new_state1
                 state2 = new_state2
                 env.agents[0].cum_rew += reward1
@@ -229,19 +229,19 @@ for run in range(0, RUN):
                 QPrim2 = Q2[state2]
                 # Update policy
                 if action1 == QPrim1.index(max(QPrim1)):
-                    if Policy1[j][action1] <= 1 - delta:
-                        if min(Policy2[j]) >= (delta / (NumberOfStates - 1)):
-                            Policy1[j][action1] = Policy1[j][action1] + delta
+                    if Policy1[state1][action1] <= 1 - delta:
+                        if min(Policy1[state1]) >= (delta / (NumberOfStates - 1)):
+                            Policy1[state1][action1] = Policy1[state1][action1] + delta
                             for k in range(0, NumberOfActions):
                                 if k != action1:
-                                    Policy1[j][k] = Policy1[j][k] - (delta/(NumberOfActions - 1))
+                                    Policy1[state1][k] = Policy1[state1][k] - (delta/(NumberOfActions - 1))
                 else:
-                    if Policy1[j][action1] >= delta:
-                        if max(Policy1[j]) <= 1 - (delta / (NumberOfStates - 1)):
-                            Policy1[j][action1] = Policy1[j][action1] - (delta / (NumberOfActions - 1))
+                    if Policy1[state1][action1] >= delta:
+                        if max(Policy1[state1]) <= 1 - (delta / (NumberOfStates - 1)):
+                            Policy1[state1][action1] = Policy1[state1][action1] - (delta / (NumberOfActions - 1))
                             for k in range(0, NumberOfActions):
                                 if k != action1:
-                                    Policy1[j][k] = Policy1[j][k] + ((delta / (NumberOfActions - 1))/(NumberOfActions - 1))
+                                    Policy1[state1][k] = Policy1[state1][k] + ((delta / (NumberOfActions - 1))/(NumberOfActions - 1))
                 state1 = new_state1
                 state2 = new_state2
                 env.agents[0].cum_rew += reward1
@@ -271,4 +271,7 @@ for i in range(0, len(wins_agent12)):
 print(f"Probability of winning for agent1 : {sum(ListOfResults)/len(ListOfResults)}")
 print(f"Standard Deviation of agent 1 : {statistics.stdev(ListOfResults)}")
 print(len(ListOfResults))
+plt.plot(ListOfResults)
+plt.ylim(0, 1)
+plt.show()
 ############################################################################
