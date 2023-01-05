@@ -251,7 +251,7 @@ for run in range(0, RUN):
                 wins_agent1.append(1)
             else:
                 wins_agent1.append(2)
-            if i % resultEvery == 0:
+            if i % resultEvery-1 == 0:
                 wins_agent12.append(wins_agent1)
                 wins_agent1 = []
 ############################################################################
@@ -263,10 +263,7 @@ ListOfResults = []
 for i in range(0, len(wins_agent12)):
     numberOf1 = wins_agent12[i].count(1)
     numberOf2 = wins_agent12[i].count(2)
-    if i == 0:
-        ListOfResults.append(0.5)
-    else:
-        ListOfResults.append(numberOf1 / (numberOf1 + numberOf2))
+    ListOfResults.append(numberOf1 / (numberOf1 + numberOf2))
 
 print(f"Probability of winning for agent1 : {sum(ListOfResults)/len(ListOfResults)}")
 print(f"Standard Deviation of agent 1 : {statistics.stdev(ListOfResults)}")
