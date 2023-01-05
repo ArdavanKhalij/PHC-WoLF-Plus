@@ -15,7 +15,7 @@ delta_w = 0.00001
 delta_l = 0.00004
 NumberOfStates = 24
 NumberOfActions = 5
-Iterations = 10000
+Iterations = 1250000
 gamma = 0.9
 RUN = 1
 

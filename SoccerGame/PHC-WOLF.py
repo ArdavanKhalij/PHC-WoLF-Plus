@@ -414,6 +414,7 @@ for i in range(0, len(wins_agent12)):
 plt.plot(ListOfResults)
 plt.ylabel("Probability of winning")
 plt.xlabel("Iterations (averaged every 50 000)")
+plt.show()
 print(f"Probability of winning for agent1 : {sum(ListOfResults)/len(ListOfResults)}")
 print(f"Standard Deviation of agent 1 : {statistics.stdev(ListOfResults)}")
 ############################################################################

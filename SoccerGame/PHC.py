@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import SoccerGame as sg
 import statistics
+
 ############################################################################
 
 
@@ -11,7 +12,7 @@ import statistics
 # Data of the problem
 alpha = 1
 alpha_decay = 0.0000004
-delta = 0.000001
+delta = 0.000004
 NumberOfStates = 24
 NumberOfActions = 5
 Iterations = 1250000
@@ -113,6 +114,8 @@ def convert_to_state(x, y):
         return 22
     elif x == 5 and y == 2:
         return 23
+
+
 ############################################################################
 
 
@@ -149,12 +152,18 @@ for run in range(0, RUN):
                 action1 = np.random.choice(range(0, NumberOfActions), p=Policy1[state1])
                 action2 = np.random.choice(range(0, NumberOfActions), p=Policy2[state2])
                 # Get rewards
-                new_state1, new_state2, reward1, reward2, done, info = env.step(action1=action1, action2=action2)
+                new_state1, new_state2, reward1, reward2, done, info = env.step(
+                    action1=action1, action2=action2
+                )
                 new_state1 = convert_to_state(new_state1[0], new_state1[1])
                 new_state2 = convert_to_state(new_state2[0], new_state2[1])
                 # Update Q tables and Policy table
-                Q1[state1][action1] = ((1 - alpha) * Q1[state1][action1]) + (alpha * (reward1 + gamma * max(Q1[new_state1])))
-                Q2[state2][action2] = ((1 - alpha) * Q2[state2][action2]) + (alpha * (reward2 + gamma * max(Q2[new_state2])))
+                Q1[state1][action1] = ((1 - alpha) * Q1[state1][action1]) + (
+                    alpha * (reward1 + gamma * max(Q1[new_state1]))
+                )
+                Q2[state2][action2] = ((1 - alpha) * Q2[state2][action2]) + (
+                    alpha * (reward2 + gamma * max(Q2[new_state2]))
+                )
                 QPrim1 = Q1[state1]
                 QPrim2 = Q2[state2]
                 # Update policy
@@ -164,28 +173,42 @@ for run in range(0, RUN):
                             Policy1[state1][action1] = Policy1[state1][action1] + delta
                             for k in range(0, NumberOfActions):
                                 if k != action1:
-                                    Policy1[state1][k] = Policy1[state1][k] - (delta/(NumberOfActions - 1))
+                                    Policy1[j][k] = Policy1[j][k] - (
+                                        delta / (NumberOfActions - 1)
+                                    )
                 else:
-                    if Policy1[state1][action1] >= delta:
-                        if max(Policy1[state1]) <= 1 - (delta / (NumberOfStates - 1)):
-                            Policy1[state1][action1] = Policy1[state1][action1] - (delta / (NumberOfActions - 1))
+                    if Policy1[j][action1] >= delta:
+                        if max(Policy1[j]) <= 1 - (delta / (NumberOfStates - 1)):
+                            Policy1[j][action1] = Policy1[j][action1] - (
+                                delta / (NumberOfActions - 1)
+                            )
                             for k in range(0, NumberOfActions):
                                 if k != action1:
-                                    Policy1[state1][k] = Policy1[state1][k] + ((delta / (NumberOfActions - 1))/(NumberOfActions - 1))
+                                    Policy1[j][k] = Policy1[j][k] + (
+                                        (delta / (NumberOfActions - 1))
+                                        / (NumberOfActions - 1)
+                                    )
                 if action2 == QPrim2.index(max(QPrim2)):
                     if Policy2[state2][action2] <= 1 - delta:
                         if min(Policy2[state2]) >= (delta / (NumberOfStates - 1)):
                             Policy2[state2][action2] = Policy2[state2][action2] + delta
                             for k in range(0, NumberOfActions):
                                 if k != action2:
-                                    Policy2[state2][k] = Policy2[state2][k] - (delta/(NumberOfActions - 1))
+                                    Policy2[j][k] = Policy2[j][k] - (
+                                        delta / (NumberOfActions - 1)
+                                    )
                 else:
-                    if Policy2[state2][action2] >= delta:
-                        if max(Policy2[state2]) <= 1 - (delta / (NumberOfStates - 1)):
-                            Policy2[state2][action2] = Policy2[state2][action2] - (delta/(NumberOfActions - 1))
+                    if Policy2[j][action2] >= delta:
+                        if max(Policy2[j]) <= 1 - (delta / (NumberOfStates - 1)):
+                            Policy2[j][action2] = Policy2[j][action2] - (
+                                delta / (NumberOfActions - 1)
+                            )
                             for k in range(0, NumberOfActions):
                                 if k != action2:
-                                    Policy2[state2][k] = Policy2[state2][k] + ((delta / (NumberOfActions - 1))/(NumberOfActions - 1))
+                                    Policy2[j][k] = Policy2[j][k] + (
+                                        (delta / (NumberOfActions - 1))
+                                        / (NumberOfActions - 1)
+                                    )
                 state1 = new_state1
                 state2 = new_state2
                 env.agents[0].cum_rew += reward1
@@ -219,12 +242,18 @@ for run in range(0, RUN):
                 action1 = np.random.choice(range(0, NumberOfActions), p=Policy1[state1])
                 action2 = np.random.choice(range(0, NumberOfActions), p=Policy2[state2])
                 # Get rewards
-                new_state1, new_state2, reward1, reward2, done, info = env.step(action1=action1, action2=action2)
+                new_state1, new_state2, reward1, reward2, done, info = env.step(
+                    action1=action1, action2=action2
+                )
                 new_state1 = convert_to_state(new_state1[0], new_state1[1])
                 new_state2 = convert_to_state(new_state2[0], new_state2[1])
                 # Update Q tables and Policy table
-                Q1[state1][action1] = ((1 - alpha) * Q1[state1][action1]) + (alpha * (reward1 + gamma * max(Q1[new_state1])))
-                Q2[state2][action2] = ((1 - alpha) * Q2[state2][action2]) + (alpha * (reward2 + gamma * max(Q2[new_state2])))
+                Q1[state1][action1] = ((1 - alpha) * Q1[state1][action1]) + (
+                    alpha * (reward1 + gamma * max(Q1[new_state1]))
+                )
+                Q2[state2][action2] = ((1 - alpha) * Q2[state2][action2]) + (
+                    alpha * (reward2 + gamma * max(Q2[new_state2]))
+                )
                 QPrim1 = Q1[state1]
                 QPrim2 = Q2[state2]
                 # Update policy
@@ -234,14 +263,21 @@ for run in range(0, RUN):
                             Policy1[state1][action1] = Policy1[state1][action1] + delta
                             for k in range(0, NumberOfActions):
                                 if k != action1:
-                                    Policy1[state1][k] = Policy1[state1][k] - (delta/(NumberOfActions - 1))
+                                    Policy1[j][k] = Policy1[j][k] - (
+                                        delta / (NumberOfActions - 1)
+                                    )
                 else:
-                    if Policy1[state1][action1] >= delta:
-                        if max(Policy1[state1]) <= 1 - (delta / (NumberOfStates - 1)):
-                            Policy1[state1][action1] = Policy1[state1][action1] - (delta / (NumberOfActions - 1))
+                    if Policy1[j][action1] >= delta:
+                        if max(Policy1[j]) <= 1 - (delta / (NumberOfStates - 1)):
+                            Policy1[j][action1] = Policy1[j][action1] - (
+                                delta / (NumberOfActions - 1)
+                            )
                             for k in range(0, NumberOfActions):
                                 if k != action1:
-                                    Policy1[state1][k] = Policy1[state1][k] + ((delta / (NumberOfActions - 1))/(NumberOfActions - 1))
+                                    Policy1[j][k] = Policy1[j][k] + (
+                                        (delta / (NumberOfActions - 1))
+                                        / (NumberOfActions - 1)
+                                    )
                 state1 = new_state1
                 state2 = new_state2
                 env.agents[0].cum_rew += reward1
@@ -251,7 +287,7 @@ for run in range(0, RUN):
                 wins_agent1.append(1)
             else:
                 wins_agent1.append(2)
-            if i % (resultEvery-1) == 0:
+            if i % (resultEvery - 1) == 0:
                 wins_agent12.append(wins_agent1)
                 wins_agent1 = []
 ############################################################################
@@ -264,6 +300,11 @@ for i in range(0, len(wins_agent12)):
     numberOf1 = wins_agent12[i].count(1)
     numberOf2 = wins_agent12[i].count(2)
     ListOfResults.append(numberOf1 / (numberOf1 + numberOf2))
+
+plt.plot(ListOfResults)
+plt.ylabel("Probability of winning")
+plt.xlabel("Iterations (averaged every 50 000)")
+plt.show()
 
 print(f"Probability of winning for agent1 : {sum(ListOfResults)/len(ListOfResults)}")
 print(f"Standard Deviation of agent 1 : {statistics.stdev(ListOfResults)}")
