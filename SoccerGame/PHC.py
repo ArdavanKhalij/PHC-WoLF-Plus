@@ -251,7 +251,7 @@ for run in range(0, RUN):
                 wins_agent1.append(1)
             else:
                 wins_agent1.append(2)
-            if i % resultEvery-1 == 0:
+            if i % (resultEvery-1) == 0:
                 wins_agent12.append(wins_agent1)
                 wins_agent1 = []
 ############################################################################
